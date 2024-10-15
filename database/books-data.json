@@ -1,0 +1,10 @@
+[
+    {
+        "bookname":"book",
+        "index":"1",
+        "auther":"aaa",
+        "publishing":"小天下",
+        "year":"2023",
+        "img":"public/picture/book.jpg"
+    }
+]

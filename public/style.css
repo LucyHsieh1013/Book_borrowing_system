@@ -1,0 +1,21 @@
+
+.dark{
+    background-color: #352d2a; 
+    color: #FFFFFF;
+}
+.BacgroundColor{
+    background-color: #FFFFFF;
+    height: 100vh;
+}
+/* ------------------------------ */
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+table, th, td {
+    border: 1px solid black;
+}
+th, td {
+    padding: 8px;
+    text-align: left;
+}
