@@ -21,19 +21,48 @@
                     <div class="mb-0 fs-2"><i class="bi bi-book p-2"></i>借書系統</div>
                 </div>
             </div>
-            <!-- 右側 -->
-            <div class="col-2 d-flex align-items-center justify-content-end">
-                <div class="dropdown">
-                    <div class="text-white text-decoration-none dropdown-toggle" href="#" role="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">選單</div>
-                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                        <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#profileModal">個人資料</a></li>
-                        <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#passwordModal">修改密碼</a></li>
-                        <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#logoutModal">登出系統</a></li>
-                    </ul>
-                </div>
-            </div>
         </div>
     </div>
 
+    <div class="container">
+        <div class="row p-3">
+            <form id="searchForm" class="d-flex" role="search">
+                <div class="input-group">
+                    <input id="searchInput" class="form-control" type="search" placeholder="Search" aria-label="Search">
+                </div>
+                <button class="btn btn-outline-success ms-2" type="submit">Search</button>
+            </form>
+        </div>
+        <div class="row">
+            <table class="table table-bordered">
+                <tbody id="book-table">
+                    <!-- 圖書資料 -->
+                </tbody>
+            </table>
+        </div>
+    </div>
     <script src="readdata.js"></script>
 </body>
+<script>
+    //存放後端傳來的數據
+    let tableData = [];
+
+    //獲取後端JSON數據
+    fetch('/get-data')
+        .then(response => response.json())
+        .then(data => {
+            //保存數據，用於搜尋
+            tableData = data;
+            console.log(tableData)
+
+            //將初始數據顯示在表格中
+            rendertable(data,'book-table');
+
+            //關鍵字搜尋並渲染表格
+            searchForm('searchForm', 'searchInput', 'book-table', tableData, ['bookname']);
+
+        })
+        .catch(error => {
+            console.error('Error fetching data', error);
+        })
+</script>

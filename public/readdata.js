@@ -7,18 +7,24 @@ function createCell(content) {
 
 //將數據顯示在表格中
 function rendertable(data, tableId){
+    const booktable = document.getElementById(tableId);
+    booktable.innerHTML = '';
+    let bookrow;
     console.log(data)
-    const tableBody = document.getElementById(tableId);
-    tableBody.innerHTML = '';
+    
+    data.forEach((book, index) =>{
+        if(index %3 === 0){
+            bookrow = document.createElement('tr');
+            booktable.appendChild(bookrow)
+        }
 
-    data.forEach(item => {
-        const row = document.createElement('tr');
+        const td = document.createElement('td');
+        td.innerHTML=`
+            <img src="${book.img}" class="img-fluid" style="max-width: 250px; height: auto;"<br>
+            <div>${book.bookname}</div>
+        `;
 
-        row.appendChild(createCell(item.name));
-        row.appendChild(createCell(item.price));
-        
-        //將行加入tbody中
-        tableBody.appendChild(row);
+        bookrow.appendChild(td);
     });
 }
 
@@ -41,7 +47,6 @@ function searchForm(formId, searchInputId, tableBodyId, tableData, searchFields)
         console.log('search: ', searchValue);
 
         // 符合搜尋的資料
-        // const filteredData = searchValue ? searchTableData(tableData, searchValue, searchFields) : tableData;
         const filteredData = searchTableData(tableData, searchValue, searchFields);
 
         console.log('Filtered data:', filteredData);

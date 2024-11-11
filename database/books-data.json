@@ -5,6 +5,30 @@
         "auther":"aaa",
         "publishing":"小天下",
         "year":"2023",
-        "img":"public/picture/book.jpg"
+        "img":"picture/book.jpg"
+    },
+    {
+        "bookname": "cook2",
+        "index": "2",
+        "auther": "bbb",
+        "publishing": "大世界",
+        "year": "2022",
+        "img": "picture/book.jpg"
+    },
+    {
+        "bookname": "book3",
+        "index": "3",
+        "auther": "ccc",
+        "publishing": "天下文化",
+        "year": "2021",
+        "img": "picture/book.jpg"
+    },
+    {
+        "bookname": "book4",
+        "index": "4",
+        "auther": "ddd",
+        "publishing": "教育出版社",
+        "year": "2020",
+        "img": "picture/book.jpg"
     }
 ]

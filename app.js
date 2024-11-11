@@ -13,7 +13,7 @@ app.use(bodyParser.urlencoded({extended: true}))
 //處理表單資訊
 app.post('/submit_form', (req,res) => {
     const data = req.body
-    const filepath = path.join(__dirname, `./database/form-data.json`)
+    const filepath = path.join(__dirname, `./database/books-data.json`)
 
     let redirectPage = '/page.html'
 
@@ -42,7 +42,7 @@ app.post('/submit_form', (req,res) => {
 
 //讀取JSON檔數據並回傳
 app.get('/get-data', (req, res) => {
-    const filepath = path.join(__dirname, './database/form-data.json');
+    const filepath = path.join(__dirname, './database/books-data.json');
 
     fs.readFile(filepath, 'utf8', (err, fileData) => {
         if(err){
