@@ -5,7 +5,8 @@
         "auther":"aaa",
         "publishing":"小天下",
         "year":"2023",
-        "img":"picture/book.jpg"
+        "img":"picture/book.jpg",
+        "status":"尚在館內"
     },
     {
         "bookname": "cook2",
@@ -13,7 +14,8 @@
         "auther": "bbb",
         "publishing": "大世界",
         "year": "2022",
-        "img": "picture/book.jpg"
+        "img": "picture/book.jpg",
+        "status":"尚在館內"
     },
     {
         "bookname": "book3",
@@ -21,7 +23,8 @@
         "auther": "ccc",
         "publishing": "天下文化",
         "year": "2021",
-        "img": "picture/book.jpg"
+        "img": "picture/book.jpg",
+        "status":"尚在館內"
     },
     {
         "bookname": "book4",
@@ -29,6 +32,7 @@
         "auther": "ddd",
         "publishing": "教育出版社",
         "year": "2020",
-        "img": "picture/book.jpg"
+        "img": "picture/book.jpg",
+        "status":"尚在館內"
     }
 ]

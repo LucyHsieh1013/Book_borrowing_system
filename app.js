@@ -5,8 +5,14 @@ const bodyParser = require("body-parser")
 const app = express()
 const port = 3000
 
-app.use(express.static(path.join(__dirname, 'public')));
+app.use('/', express.static(path.join(__dirname, 'public')));
 
+app.get('/book', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'books.html'));
+});
+app.get('/borrow', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'borrow.html'));
+});
 //解析表單數據，將數據放到req.body中
 app.use(bodyParser.urlencoded({extended: true}))
 

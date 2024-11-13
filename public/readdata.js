@@ -20,8 +20,10 @@ function rendertable(data, tableId){
 
         const td = document.createElement('td');
         td.innerHTML=`
-            <img src="${book.img}" class="img-fluid" style="max-width: 250px; height: auto;"<br>
-            <div>${book.bookname}</div>
+            <a href="borrow?index=${book.index}">
+                <img src="${book.img}" class="img-fluid" style="max-width: 250px; height: auto;"><br>
+                <div>${book.bookname}</div>
+            </a>
         `;
 
         bookrow.appendChild(td);

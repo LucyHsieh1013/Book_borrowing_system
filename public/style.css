@@ -31,3 +31,8 @@ th, td {
     width: 40%; 
     object-fit: cover; 
   } */
+
+a{
+    color: black; 
+    text-decoration: none
+}
