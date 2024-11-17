@@ -20,38 +20,10 @@ app.get('/manager', (req, res) => {
 app.use(bodyParser.urlencoded({extended: true}))
 app.use(express.json());
 
-//處理表單資訊
-// app.post('/submit_form', (req,res) => {
-//     const data = req.body
-//     const filepath = path.join(__dirname, `./database/books-data.json`)
-
-//     let redirectPage = '/page.html'
-
-//     console.log(data)
-//     fs.readFile(filepath,'utf8', (err,fileData) => {
-//         if(err && err.code !== 'ENOENT'){//忽略ENOENT文件不存在的錯誤，第一次輸入資料時創建檔案
-//             return res.status(500).json({message: 'Error reading file'})
-//         }
-        
-//         let jsonData = []
-//         if(fileData){
-//             jsonData = JSON.parse(fileData);
-//         }
-
-//         jsonData.push(data)
-//         //如果文件不存在，fs.writeFile 會創建一個新文件；如果文件已存在，會加入內容
-//         //讀取jsonData的內容，將資料寫入filepath路徑的檔案裡
-//         fs.writeFile(filepath, JSON.stringify(jsonData, null, 2), (err) => {
-//             if(err){
-//                 return res.status(500).json({message: 'Error writing to file'});
-//             }
-//             res.redirect(redirectPage)
-//         })
-//     })
-// })
+//--------------------------------------------------------------------------
 
 //book.html讀取books-data.json檔數據並回傳
-app.get('/get-data', (req, res) => {
+app.get('/get-bookdata', (req, res) => {
     const filepath = path.join(__dirname, './database/books-data.json');
 
     fs.readFile(filepath, 'utf8', (err, fileData) => {
@@ -69,19 +41,12 @@ app.get('/get-data', (req, res) => {
     })
 })
 
-//
-app.listen(port,() => {
-    console.log("server is running on port 3000")
-})
-
 //manager.html新增書籍到books-data.json
 app.post('/AddBook', (req,res) => {
     const data = req.body
     const filepath = path.join(__dirname, `./database/books-data.json`)
 
-    // let redirectPage = '/manager';
-
-    console.log("資料:",data);
+    console.log("書籍資料:",data);
 
     fs.readFile(filepath,'utf8', (err,fileData) => {
         if(err && err.code !== 'ENOENT'){//忽略ENOENT文件不存在的錯誤，第一次輸入資料時創建檔案
@@ -105,8 +70,65 @@ app.post('/AddBook', (req,res) => {
             if(err){
                 return res.status(500).json({message: 'Error writing to file'});
             }
-            // res.redirect(redirectPage)
+
             res.json({ message: '書籍新增成功', data: newBookData });
         })
     })
+})
+
+//--------------------------------------------------------------------------
+
+app.get('/get-accountdata', (req, res) => {
+    const filepath = path.join(__dirname, './database/account-data.json');
+
+    fs.readFile(filepath, 'utf8', (err, fileData) => {
+        if(err){
+            return res.status(500).json({accountmessage: 'Error reading file'});
+        }
+
+        let jsonData = []
+        if(fileData){
+            jsonData = JSON.parse(fileData);
+        }
+
+        // console.log(jsonData);
+        res.json(jsonData);
+    })
+})
+//manager.html新增帳號到account-data.json
+app.post('/AddAccount', (req,res) => {
+    const data = req.body
+    const filepath = path.join(__dirname, `./database/account-data.json`)
+
+    console.log("帳號資料:",data);
+
+    fs.readFile(filepath,'utf8', (err,fileData) => {
+        if(err && err.code !== 'ENOENT'){//忽略ENOENT文件不存在的錯誤，第一次輸入資料時創建檔案
+            return res.status(500).json({accountmessage: 'Error reading file'})
+        }
+        
+        let jsonData = []
+        if(fileData){
+            jsonData = JSON.parse(fileData);
+        }
+
+        jsonData.push(data)
+        console.log("jsonData:",jsonData)
+
+        //如果文件不存在，fs.writeFile 會創建一個新文件；如果文件已存在，會加入內容
+        //讀取jsonData的內容，將資料寫入filepath路徑的檔案裡
+        fs.writeFile(filepath, JSON.stringify(jsonData, null, 2), (err) => {
+            if(err){
+                return res.status(500).json({ accountmessage: 'Error writing to file'});
+            }
+
+            res.json({ accountmessage: '帳號新增成功', data: data });
+        })
+    })
+})
+
+//--------------------------------------------------------------------------
+
+app.listen(port,() => {
+    console.log("server is running on port 3000")
 })

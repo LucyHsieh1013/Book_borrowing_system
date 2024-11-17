@@ -81,3 +81,68 @@ function AddtotableData(newbook){
 
     rendertable(tableData, 'showdata')
 }
+//-------------------------------------------------------------
+function renderaccounttable(data, tableId){
+    console.log(data)
+    const tableBody = document.getElementById(tableId);
+    tableBody.innerHTML = '';
+
+    data.forEach(item => {
+        const row = document.createElement('tr');
+
+        row.appendChild(createCell(item.account));
+        row.appendChild(createCell(item.password));
+        
+        //將行加入tbody中
+        tableBody.appendChild(row);
+    });
+}
+async function accountsubmit(e) {
+    e.preventDefault();
+    
+    const account = document.getElementById('account').value;
+    const password = document.getElementById('password').value;
+
+    const newaccount = {
+        account,
+        password
+    };
+
+    console.log("新帳號資料:", newaccount)
+    
+    //將新書資料送到後端
+    await sendaccountdata(newaccount)
+
+    //清空表單
+    document.getElementById('accountform').reset();
+}
+
+async function sendaccountdata(newaccount) {
+    try{
+        const response = await fetch('/AddAccount', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(newaccount),
+        })
+
+        const result = await response.json();
+        console.log('後端回應:', result);
+
+        AddtoaccountData(result.data)
+
+        document.getElementById('accountmessage').textContent = result.accountmessage;
+        document.getElementById('accountform').reset();
+    } catch (error) {
+        console.error('發生錯誤:',  error.accountmessage || error);
+    }
+}
+
+//將新增的資料存到tableData
+function AddtoaccountData(newaccount){
+    accountData.push(newaccount);
+    console.log("目前帳號資料:", accountData)
+
+    renderaccounttable(accountData, 'showaccount')
+}

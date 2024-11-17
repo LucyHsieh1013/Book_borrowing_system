@@ -8,10 +8,11 @@
     <link href="/assets/css/custom.css" rel="stylesheet">
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="home.css">
 </head>
 <body>
     <div class="BacgroundColor">
+        <!-- 左邊圖片 -->
         <div class="container-fulid d-flex align-items-center justify-content-center h-100">
             <div class="col-md-7 h-100" style="position: relative;">
                 <img src="picture/book.jpg" class="h-100 w-100" style="position: absolute; z-index: 1;">
@@ -23,9 +24,7 @@
                 <div class="col-md-6 text-center" >
                     <form method="POST" action="/login">
                         <div class="form">
-                            <div class="note">
-                                <p>登入</p>
-                            </div>
+                            <div class="h4">登入</div>
                             <div class="form-group">
                                 <input type="text" class="form-control rounded-pill shadow " placeholder="使用者名稱" name="user_id" value=""/>
                             </div>
@@ -34,18 +33,27 @@
                             </div>
                             <button type="submit" class="btn col-12 dark mt-2 rounded-pill shadow ">登入</button>
                         </div>
-                        <div class="d-flex justify-content-left mt-2"><a href="#" class="h6" data-bs-toggle="modal" data-bs-target="#forgetpasswd">註冊</a></div>
+                        <div class="d-flex justify-content-end mt-2"><a href="#" class="h6" data-bs-toggle="modal" data-bs-target="#forgetpasswd">註冊</a></div>
                     </form>
                 </div>
                 <div class="modal fade" id="forgetpasswd" tabindex="-1" aria-labelledby="forgetpasswdLabel" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h5 class="modal-title" id="forgetpasswdLabel">請輸入您的 tmail 帳號</h5>
+                                <h5 class="modal-title" id="forgetpasswdLabel">開始註冊</h5>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
-                                <input type="email" id="guestEmail" class="form-control" placeholder="輸入您的 tmail 帳號">
+                                <div class="container" >
+                                    <div class="row p-2">
+                                        <label for="account" class="col-md-4">Email:</label>
+                                        <input type="email" id="account" class="form-control col-md-8" placeholder="Email@gmail.com">
+                                    </div>
+                                    <div class="row p-2">
+                                        <label for="account" class="col-md-4">密碼:</label>
+                                        <input type="password" id="password" class="form-control col-md-8" placeholder="八位數密碼(須包含大/小寫字母、數字)">
+                                    </div>
+                                </div>
                             </div>
                             <div class="modal-footer">
                                 <button class="btn dark" id="confirmEmailBtn">送出</button>
@@ -54,7 +62,7 @@
                     </div>
                 </div>
 
-                <div class="modal fade" id="resetPasswordModal" aria-hidden="true" tabindex="-1">
+                <!-- <div class="modal fade" id="resetPasswordModal" aria-hidden="true" tabindex="-1">
                     <div class="modal-dialog modal-dialog-centered">
                         <div class="modal-content">
                             <div class="modal-body">
@@ -62,7 +70,7 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> -->
             </div>
         </div>
     </div>
@@ -70,108 +78,109 @@
 </html>
 
 <script>
-    $(document).ready(function() {
-        $(".resetPassword").load("reset_password.html");
-    });
-    // 抓取url中的token參數，參數存在則顯示重設密碼視窗
-    document.addEventListener("DOMContentLoaded", function() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const token = urlParams.get('token');
-        if (token) {
-            var resetPasswordModal = new bootstrap.Modal(document.getElementById('resetPasswordModal'));
-            resetPasswordModal.show(); 
-        }
-    });
 
-    document.addEventListener('DOMContentLoaded', function() {
-        var confirmEmailBtn = document.getElementById('confirmEmailBtn');
-        var resendButton = document.getElementById('resendCode');
-        var timerDisplay = document.getElementById('timer');
+    // $(document).ready(function() {
+    //     $(".resetPassword").load("reset_password.html");
+    // });
+    // // 抓取url中的token參數，參數存在則顯示重設密碼視窗
+    // document.addEventListener("DOMContentLoaded", function() {
+    //     const urlParams = new URLSearchParams(window.location.search);
+    //     const token = urlParams.get('token');
+    //     if (token) {
+    //         var resetPasswordModal = new bootstrap.Modal(document.getElementById('resetPasswordModal'));
+    //         resetPasswordModal.show(); 
+    //     }
+    // });
 
-        function sendCode() {
-            if (!guest) {
-                alert('請輸入有效的電子郵件地址');
-                return;
-            }
-            fetch('/send-code', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ email: guest })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('驗證碼已發送到您的信箱');
-                    startCooldown(); // 開始冷卻倒數
-                } else {
-                    alert('發送失敗: ' + data.message);
-                    startCooldown();
-                }
-            })
-            .catch(error => console.error('Error:', error));
-        }
+    // document.addEventListener('DOMContentLoaded', function() {
+    //     var confirmEmailBtn = document.getElementById('confirmEmailBtn');
+    //     var resendButton = document.getElementById('resendCode');
+    //     var timerDisplay = document.getElementById('timer');
 
-        function startCooldown() {
-            var cooldownTime = 10; // 設定冷卻時間為 10 秒
-            clearInterval(countdown); // 取消之前的倒數計時器
-            resendButton.disabled = true; // 禁用重新發送按鈕
+    //     function sendCode() {
+    //         if (!guest) {
+    //             alert('請輸入有效的電子郵件地址');
+    //             return;
+    //         }
+    //         fetch('/send-code', {
+    //             method: 'POST',
+    //             headers: {
+    //                 'Content-Type': 'application/json'
+    //             },
+    //             body: JSON.stringify({ email: guest })
+    //         })
+    //         .then(response => response.json())
+    //         .then(data => {
+    //             if (data.success) {
+    //                 alert('驗證碼已發送到您的信箱');
+    //                 startCooldown(); // 開始冷卻倒數
+    //             } else {
+    //                 alert('發送失敗: ' + data.message);
+    //                 startCooldown();
+    //             }
+    //         })
+    //         .catch(error => console.error('Error:', error));
+    //     }
 
-            countdown = setInterval(function() {
-                if (cooldownTime <= 0) {
-                    clearInterval(countdown);
-                    resendButton.disabled = false; // 啟用重新發送按鈕
-                    timerDisplay.textContent = ''; // 清除倒數顯示
-                } else {
-                    timerDisplay.textContent = '請稍候 ' + cooldownTime + ' 秒後再試。';
-                }
-                cooldownTime -= 1;
-            }, 1000);
-        }
+    //     function startCooldown() {
+    //         var cooldownTime = 10; // 設定冷卻時間為 10 秒
+    //         clearInterval(countdown); // 取消之前的倒數計時器
+    //         resendButton.disabled = true; // 禁用重新發送按鈕
 
-        confirmEmailBtn.addEventListener('click', function() {
-            guest = document.getElementById('guestEmail').value;
-            if (guest) {
-                sendCode();
-                var emailModal = bootstrap.Modal.getInstance(document.getElementById('forgetpasswd'));
-                emailModal.hide();
-                var verificationModal = new bootstrap.Modal(document.getElementById('Verification'));
-                verificationModal.show();
-            } else {
-                alert('請輸入您的 tmail 帳號');
-            }
-        });
+    //         countdown = setInterval(function() {
+    //             if (cooldownTime <= 0) {
+    //                 clearInterval(countdown);
+    //                 resendButton.disabled = false; // 啟用重新發送按鈕
+    //                 timerDisplay.textContent = ''; // 清除倒數顯示
+    //             } else {
+    //                 timerDisplay.textContent = '請稍候 ' + cooldownTime + ' 秒後再試。';
+    //             }
+    //             cooldownTime -= 1;
+    //         }, 1000);
+    //     }
 
-        resendButton.addEventListener('click', function(event) {
-            event.preventDefault();
-            sendCode();
-            startCooldown();
-        });
-    });
+    //     confirmEmailBtn.addEventListener('click', function() {
+    //         guest = document.getElementById('guestEmail').value;
+    //         if (guest) {
+    //             sendCode();
+    //             var emailModal = bootstrap.Modal.getInstance(document.getElementById('forgetpasswd'));
+    //             emailModal.hide();
+    //             var verificationModal = new bootstrap.Modal(document.getElementById('Verification'));
+    //             verificationModal.show();
+    //         } else {
+    //             alert('請輸入您的 tmail 帳號');
+    //         }
+    //     });
 
-    function submitCode(event) {
-        event.preventDefault();
-        const code = document.querySelector('input[name="code"]').value;
-        if (!code) {
-            alert('請輸入驗證碼');
-            return;
-        }
-        fetch('/verify-code', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ code: code, email: guest }) // 包含 email
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert('驗證碼正確');
-            } else {
-                alert('驗證碼錯誤: ' + data.message);
-            }
-        })
-        .catch(error => console.error('Error:', error));
-    }
+    //     resendButton.addEventListener('click', function(event) {
+    //         event.preventDefault();
+    //         sendCode();
+    //         startCooldown();
+    //     });
+    // });
+
+    // function submitCode(event) {
+    //     event.preventDefault();
+    //     const code = document.querySelector('input[name="code"]').value;
+    //     if (!code) {
+    //         alert('請輸入驗證碼');
+    //         return;
+    //     }
+    //     fetch('/verify-code', {
+    //         method: 'POST',
+    //         headers: {
+    //             'Content-Type': 'application/json'
+    //         },
+    //         body: JSON.stringify({ code: code, email: guest }) // 包含 email
+    //     })
+    //     .then(response => response.json())
+    //     .then(data => {
+    //         if (data.success) {
+    //             alert('驗證碼正確');
+    //         } else {
+    //             alert('驗證碼錯誤: ' + data.message);
+    //         }
+    //     })
+    //     .catch(error => console.error('Error:', error));
+    // }
 </script>
