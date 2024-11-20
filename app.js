@@ -2,6 +2,8 @@ const express = require("express")
 const path = require("path")
 const fs = require('fs')
 const bodyParser = require("body-parser")
+// const session = require("express-session")
+// const bcrypt = require("bcrypt")
 const app = express()
 const port = 3000
 
@@ -19,10 +21,32 @@ app.get('/manager', (req, res) => {
 //解析表單數據，將數據放到req.body中
 app.use(bodyParser.urlencoded({extended: true}))
 app.use(express.json());
+//登入--------------------------------------------------------
+app.post('/login', (req,res) =>{
+    const {account, password} = req.body;
+    const filepath = path.join(__dirname, './database/account-data.json')
 
-//--------------------------------------------------------------------------
+    console.log("帳號密碼:",account, password)
+    fs.readFile(filepath, 'utf8', (err,fileData) => {
+        if(err){
+            return res.status(500).json({message: "伺服器錯誤，無法讀取資料"})
+        }
 
-//book.html讀取books-data.json檔數據並回傳
+        const accounts = JSON.parse(fileData)
+
+        const user = accounts.find(
+            (user) => user.account === account && user.password === password
+        )
+
+        if(user){
+            return res.json({message: "登入成功!", user:{account: user.account} })
+        }else{
+            return res.status(400).json({message: "帳號或密碼錯誤"})
+        }
+    })
+})
+
+//book.html讀取books-data.json檔數據並回傳--------------------------------------------------------
 app.get('/get-bookdata', (req, res) => {
     const filepath = path.join(__dirname, './database/books-data.json');
 
@@ -76,8 +100,7 @@ app.post('/AddBook', (req,res) => {
     })
 })
 
-//--------------------------------------------------------------------------
-
+//manager.html讀取account-data.json檔數據並回傳--------------------------------------------
 app.get('/get-accountdata', (req, res) => {
     const filepath = path.join(__dirname, './database/account-data.json');
 
@@ -97,21 +120,26 @@ app.get('/get-accountdata', (req, res) => {
 })
 //manager.html新增帳號到account-data.json
 app.post('/AddAccount', (req,res) => {
+    // const {account, password} = req.body
     const data = req.body
     const filepath = path.join(__dirname, `./database/account-data.json`)
-
     console.log("帳號資料:",data);
 
     fs.readFile(filepath,'utf8', (err,fileData) => {
         if(err && err.code !== 'ENOENT'){//忽略ENOENT文件不存在的錯誤，第一次輸入資料時創建檔案
             return res.status(500).json({accountmessage: 'Error reading file'})
         }
-        
+        // const hashedPassword = await hashPassword(password);
+        // const newaccount = {
+        //     account,
+        //     password:hashedPassword
+        // }
         let jsonData = []
         if(fileData){
             jsonData = JSON.parse(fileData);
         }
 
+        // jsonData.push(newaccount)
         jsonData.push(data)
         console.log("jsonData:",jsonData)
 
@@ -126,9 +154,30 @@ app.post('/AddAccount', (req,res) => {
         })
     })
 })
+//登入驗證-----------------------------------------------------
+// app.get('/login',(req,res) =>{
 
+// });
+// 設定 session
+// app.use(
+//     session({
+//         secret: "my_secret_key",
+//         resave: false,
+//         saveUninitialized: false,
+//         cookie: { maxAge: 60000 },
+//     })
+// )
+//密碼加密
+// async function hashPassword(password) {
+//     try {
+//         const hashedPassword = await bcrypt.hash(password, 10);
+//         console.log("Hashed Password:", hashedPassword);
+//         return hashedPassword;
+//     } catch (error) {
+//         console.error("Hashing Error:", error);
+//     }
+// }
 //--------------------------------------------------------------------------
-
 app.listen(port,() => {
     console.log("server is running on port 3000")
 })
