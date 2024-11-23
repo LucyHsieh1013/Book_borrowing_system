@@ -99,7 +99,7 @@
                                     <th>狀態</th>
                                 </tr>
                             </thead>
-                            <tbody id="showdata">
+                            <tbody id="showbooks">
                 
                             </tbody>
                         </table>
@@ -118,7 +118,7 @@
 
     document.getElementById('bookform').addEventListener('submit', booksubmit)
     //獲取後端JSON數據
-    fetch('/get-bookdata')
+    fetch('/get-data/books')
         .then(response => response.json())
         .then(data => {
             //保存數據，用於搜尋
@@ -126,7 +126,7 @@
             console.log(tableData)
 
             //將初始數據顯示在表格中
-            rendertable(data,'showdata');
+            rendertable(data,'showbooks');
 
             //關鍵字搜尋並渲染表格
             // searchForm('searchForm', 'searchInput', 'data_table', tableData, ['name', 'price']);
@@ -138,7 +138,7 @@
 //------------------------------------------------------------------------------------
     let accountData = [];
     document.getElementById('accountform').addEventListener('submit', accountsubmit)
-    fetch('/get-accountdata')
+    fetch('/get-data/account')
         .then(response => response.json())
         .then(data => {
             //保存數據，用於搜尋

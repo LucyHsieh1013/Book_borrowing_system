@@ -36,7 +36,7 @@
     const index = url.get('index');
     console.log(index)
     //獲取後端JSON數據
-    fetch('/get-bookdata')
+    fetch('/get-data/books')
         .then(response => response.json())
         .then(data => {
             const item = data.find(item => item.index === index);

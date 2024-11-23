@@ -54,7 +54,7 @@ async function booksubmit(e) {
 
 async function sendbookdata(newbook) {
     try{
-        const response = await fetch('/AddBook', {
+        const response = await fetch('/add-data/books', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -119,7 +119,7 @@ async function accountsubmit(e) {
 
 async function sendaccountdata(newaccount) {
     try{
-        const response = await fetch('/AddAccount', {
+        const response = await fetch('/add-data/account', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
