@@ -42,8 +42,10 @@
                         <table class="table">
                             <thead>
                                 <tr>
+                                    <th>序號</th>
+                                    <th>編號</th>
                                     <th>帳號</th>
-                                    <th>密碼</th>
+                                    <th>身分</th>
                                 </tr>
                             </thead>
                             <tbody id="showaccount">
@@ -91,6 +93,7 @@
                         <table class="table">
                             <thead>
                                 <tr>
+                                    <th>序號</th>
                                     <th>編號</th>
                                     <th>書名</th>
                                     <th>作者</th>
@@ -111,48 +114,70 @@
     </div>
     <script src="./js/manager.js"></script>
 </body>
-</html>
+</html>`
 <script>
-    //存放後端傳來的數據
-    let tableData = [];
+    // fetch('/data')
+    //     .then(response => response.json())
+    //     .then(data => {
+    //     const tableBody = document.getElementById("showaccount");
+    //     tableBody.innerHTML = '';
+        
+    //     // 遍歷數據並插入到表格中
+    //     data.forEach((row, index) => {
+    //         const tr = document.createElement('tr');
+    //         console.log("帳號",row.password)
+    //         tr.innerHTML = `
+    //             <td>${index + 1}</td>
+    //             <td>${row.account}</td>
+    //             <td>${row.password}</td>
+    //         `;
 
-    document.getElementById('bookform').addEventListener('submit', booksubmit)
-    //獲取後端JSON數據
-    fetch('/get-data/books')
-        .then(response => response.json())
-        .then(data => {
-            //保存數據，用於搜尋
-            tableData = data;
-            console.log(tableData)
+    //         tableBody.appendChild(tr);
+    //         });
+    //     })
+    //     .catch(error => {
+    //     console.error('Error fetching data:', error);
+    // });
+//存放後端傳來的數據
+let tableData = [];
 
-            //將初始數據顯示在表格中
-            rendertable(data,'showbooks');
+document.getElementById('bookform').addEventListener('submit', booksubmit)
+//獲取後端JSON數據
+fetch('/data/booksdata')
+    .then(response => response.json())
+    .then(data => {
+        //保存數據，用於搜尋
+        tableData = data;
+        console.log(tableData)
 
-            //關鍵字搜尋並渲染表格
-            // searchForm('searchForm', 'searchInput', 'data_table', tableData, ['name', 'price']);
+        //將初始數據顯示在表格中
+        rendertable(data,'showbooks');
 
-        })
-        .catch(error => {
-            console.error('Error fetching data', error);
-        })
+        //關鍵字搜尋並渲染表格
+        // searchForm('searchForm', 'searchInput', 'data_table', tableData, ['name', 'price']);
+
+    })
+    .catch(error => {
+        console.error('Error fetching data', error);
+    })
 //------------------------------------------------------------------------------------
-    let accountData = [];
-    document.getElementById('accountform').addEventListener('submit', accountsubmit)
-    fetch('/get-data/account')
-        .then(response => response.json())
-        .then(data => {
-            //保存數據，用於搜尋
-            accountData = data;
-            console.log(accountData)
+let accountData = [];
+document.getElementById('accountform').addEventListener('submit', accountsubmit)
+fetch('/data/userdata')
+    .then(response => response.json())
+    .then(data => {
+        //保存數據，用於搜尋
+        accountData = data;
+        console.log(accountData)
 
-            //將初始數據顯示在表格中
-            renderaccounttable(data,'showaccount');
+        //將初始數據顯示在表格中
+        renderaccounttable(data,'showaccount');
 
-            //關鍵字搜尋並渲染表格
-            // searchForm('searchForm', 'searchInput', 'data_table', tableData, ['name', 'price']);
+        //關鍵字搜尋並渲染表格
+        // searchForm('searchForm', 'searchInput', 'data_table', tableData, ['name', 'price']);
 
-        })
-        .catch(error => {
-            console.error('Error fetching data', error);
-        })
+    })
+    .catch(error => {
+        console.error('Error fetching data', error);
+    })
 </script>

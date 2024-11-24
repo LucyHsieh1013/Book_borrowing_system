@@ -11,19 +11,34 @@ function rendertable(data, tableId){
     const tableBody = document.getElementById(tableId);
     tableBody.innerHTML = '';
 
-    data.forEach(item => {
-        const row = document.createElement('tr');
+    data.forEach((row, index) => {
+        const tr = document.createElement('tr');
+        console.log("帳號",row.password)
+        tr.innerHTML = `
+            <td>${index + 1}</td>
+            <td>${row.bookindex}</td>
+            <td>${row.bookname}</td>
+            <td>${row.auther}</td>
+            <td>${row.publishing}</td>
+            <td>${row.year}</td>
+            <td>${row.status}</td>
+        `;
 
-        row.appendChild(createCell(item.index));
-        row.appendChild(createCell(item.bookname));
-        row.appendChild(createCell(item.auther));
-        row.appendChild(createCell(item.publishing));
-        row.appendChild(createCell(item.year));
-        row.appendChild(createCell(item.status));
-        
-        //將行加入tbody中
-        tableBody.appendChild(row);
+        tableBody.appendChild(tr);
     });
+    // data.forEach(item => {
+    //     const row = document.createElement('tr');
+
+    //     row.appendChild(createCell(item.index));
+    //     row.appendChild(createCell(item.bookname));
+    //     row.appendChild(createCell(item.auther));
+    //     row.appendChild(createCell(item.publishing));
+    //     row.appendChild(createCell(item.year));
+    //     row.appendChild(createCell(item.status));
+        
+    //     //將行加入tbody中
+    //     tableBody.appendChild(row);
+    // });
 }
 
 //表單
@@ -81,20 +96,23 @@ function AddtotableData(newbook){
 
     rendertable(tableData, 'showdata')
 }
-//-------------------------------------------------------------
+//帳號-------------------------------------------------------------
 function renderaccounttable(data, tableId){
     console.log(data)
     const tableBody = document.getElementById(tableId);
     tableBody.innerHTML = '';
 
-    data.forEach(item => {
-        const row = document.createElement('tr');
+    data.forEach((row, index) => {
+        const tr = document.createElement('tr');
+        console.log("帳號",row.password)
+        tr.innerHTML = `
+            <td>${index + 1}</td>
+            <td>${row.userindex}</td>
+            <td>${row.account}</td>
+            <td>${row.identity}</td>
+        `;
 
-        row.appendChild(createCell(item.account));
-        row.appendChild(createCell(item.password));
-        
-        //將行加入tbody中
-        tableBody.appendChild(row);
+        tableBody.appendChild(tr);
     });
 }
 async function accountsubmit(e) {

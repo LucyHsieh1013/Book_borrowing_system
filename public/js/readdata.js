@@ -20,8 +20,8 @@ function rendertable(data, tableId){
 
         const td = document.createElement('td');
         td.innerHTML=`
-            <a href="borrow?index=${book.index}">
-                <img src="${book.img}" class="img-fluid" style="max-width: 250px; height: auto;"><br>
+            <a href="borrow?index=${book.bookindex}">
+                <img src="${book.picture}" class="img-fluid" style="max-width: 150px; height: auto;"><br>
                 <div>${book.bookname}</div>
             </a>
         `;

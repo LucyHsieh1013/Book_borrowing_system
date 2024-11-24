@@ -25,11 +25,14 @@ app.use(bodyParser.urlencoded({extended: true}))
 app.use(bodyParser.json());
 
 //database連線--------------------------------------------------------
-app.get("/data", async (req, res) => {
+app.get("/data/:type", async (req, res) => {
+    const datatype = req.params.type
+    console.log(datatype)
     // Execute a SELECT query
     try {
-        const result = await queryDB("SELECT * FROM userdata"); // 執行查詢
+        const result = await queryDB(`SELECT * FROM ${datatype}`); // 執行查詢
         res.json(result.recordset); // 將結果回傳至客戶端
+        console.log(result.recordset)
     } catch (err) {
         console.error("Error executing query:", err);
         res.status(500).json({ error: "Failed to fetch data from the database" });
@@ -61,24 +64,24 @@ app.post('/login', (req,res) =>{
 })
 
 //讀取json檔數據並回傳--------------------------------------------------------
-app.get('/get-data/:type', (req, res) => {
-    const datatype = req.params.type
-    const filepath = path.join(__dirname, `./database/${datatype}-data.json`);
+// app.get('/get-data/:type', async(req, res) => {
+//     const datatype = req.params.type
+//     const filepath = path.join(__dirname, `./database/${datatype}-data.json`);
 
-    fs.readFile(filepath, 'utf8', (err, fileData) => {
-        if(err){
-            return res.status(500).json({message: 'Error reading file'});
-        }
+//     fs.readFile(filepath, 'utf8', (err, fileData) => {
+//         if(err){
+//             return res.status(500).json({message: 'Error reading file'});
+//         }
 
-        let jsonData = []
-        if(fileData){
-            jsonData = JSON.parse(fileData);
-        }
+//         let jsonData = []
+//         if(fileData){
+//             jsonData = JSON.parse(fileData);
+//         }
 
-        // console.log(jsonData);
-        res.json(jsonData);
-    })
-})
+//         // console.log(jsonData);
+//         res.json(jsonData);
+//     })
+// })
 
 //manager新增數據到json
 app.post('/add-data/:type', (req,res) => {
