@@ -43,7 +43,6 @@ function searchForm(formId, searchInputId, tableBodyId, tableData, searchFields)
     document.getElementById(formId).addEventListener('submit', function(event){
         event.preventDefault();
 
-        
         const searchValue = document.getElementById(searchInputId).value;
 
         console.log('search: ', searchValue);
@@ -57,3 +56,30 @@ function searchForm(formId, searchInputId, tableBodyId, tableData, searchFields)
         rendertable(filteredData, tableBodyId);
     });
 }
+// function searchForm(formId, searchInputId, tableBodyId, apiEndpoint){
+//     document.getElementById(formId).addEventListener('submit', async function(event){
+//         event.preventDefault();
+
+//         const searchValue = document.getElementById(searchInputId).value;
+
+//         console.log('search: ', searchValue);
+
+//         try{
+//             const response = await fetch(apiEndpoint, {
+//                 method: 'POST',
+//                 headers: {
+//                     'Content-Type': 'application/json'
+//                 },
+//                 body: JSON.stringify({ search: searchValue }) // 將關鍵字放入請求主體
+//             });            
+//             if (!response.ok) throw new Error('Failed to fetch data from server');
+
+//             const data = await response.json();
+//             console.log('searchdata: ', data);
+
+//             rendertable(data, tableBodyId);
+//         }catch(error){
+//             console.error('Error fetching data',error);
+//         }
+//     });
+// }

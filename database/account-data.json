@@ -10,5 +10,9 @@
   {
     "account": "s2222",
     "password": "s2222"
+  },
+  {
+    "account": "U002",
+    "password": "test2"
   }
 ]

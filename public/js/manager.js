@@ -26,37 +26,26 @@ function rendertable(data, tableId){
 
         tableBody.appendChild(tr);
     });
-    // data.forEach(item => {
-    //     const row = document.createElement('tr');
-
-    //     row.appendChild(createCell(item.index));
-    //     row.appendChild(createCell(item.bookname));
-    //     row.appendChild(createCell(item.auther));
-    //     row.appendChild(createCell(item.publishing));
-    //     row.appendChild(createCell(item.year));
-    //     row.appendChild(createCell(item.status));
-        
-    //     //將行加入tbody中
-    //     tableBody.appendChild(row);
-    // });
 }
 
 //表單
 async function booksubmit(e) {
     e.preventDefault();
     
-    const index = document.getElementById('index').value;
+    const bookindex = document.getElementById('bookindex').value;
     const bookname = document.getElementById('bookname').value;
     const auther = document.getElementById('auther').value;
     const publishing = document.getElementById('publishing').value;
     const year = document.getElementById('year').value;
+    const status = document.getElementById('status').value;
 
     const newbook = {
-        index,
+        bookindex,
         bookname,
         auther,
         publishing,
-        year
+        year,
+        status
     };
     console.log("新書資料:",newbook)
     
@@ -69,7 +58,7 @@ async function booksubmit(e) {
 
 async function sendbookdata(newbook) {
     try{
-        const response = await fetch('/add-data/books', {
+        const response = await fetch('/adddata/book', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -80,10 +69,13 @@ async function sendbookdata(newbook) {
         const result = await response.json();
         console.log('後端回應:', result);
 
-        AddtotableData(result.data)
-
-        document.getElementById('message').textContent = result.message;
-        document.getElementById('bookform').reset();
+        if (response.ok) {
+            alert(result.message); // 顯示成功訊息
+        } else {
+            alert(result.error); // 顯示錯誤訊息
+        }
+        console.log('newbook:',newbook)
+        AddtotableData(newbook)
     } catch (error) {
         console.error('發生錯誤:',  error.message || error);
     }
@@ -94,7 +86,7 @@ function AddtotableData(newbook){
     tableData.push(newbook);
     console.log("目前書單:", tableData)
 
-    rendertable(tableData, 'showdata')
+    rendertable(tableData, 'showbooks')
 }
 //帳號-------------------------------------------------------------
 function renderaccounttable(data, tableId){
@@ -104,12 +96,12 @@ function renderaccounttable(data, tableId){
 
     data.forEach((row, index) => {
         const tr = document.createElement('tr');
-        console.log("帳號",row.password)
+
         tr.innerHTML = `
             <td>${index + 1}</td>
             <td>${row.userindex}</td>
             <td>${row.account}</td>
-            <td>${row.identity}</td>
+            <td>${row.role}</td>
         `;
 
         tableBody.appendChild(tr);
@@ -117,13 +109,17 @@ function renderaccounttable(data, tableId){
 }
 async function accountsubmit(e) {
     e.preventDefault();
-    
+
+    const userindex = document.getElementById('userindex').value;
     const account = document.getElementById('account').value;
     const password = document.getElementById('password').value;
+    const role = document.getElementById('role').value;
 
     const newaccount = {
+        userindex,
         account,
-        password
+        password,
+        role
     };
 
     console.log("新帳號資料:", newaccount)
@@ -137,7 +133,7 @@ async function accountsubmit(e) {
 
 async function sendaccountdata(newaccount) {
     try{
-        const response = await fetch('/add-data/account', {
+        const response = await fetch('/adddata/account', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -148,10 +144,13 @@ async function sendaccountdata(newaccount) {
         const result = await response.json();
         console.log('後端回應:', result);
 
-        AddtoaccountData(result.data)
-
-        document.getElementById('accountmessage').textContent = result.accountmessage;
-        document.getElementById('accountform').reset();
+        if (response.ok) {
+            alert(result.message); // 顯示成功訊息
+        } else {
+            alert(result.error); // 顯示錯誤訊息
+        }
+        console.log('newaccount',newaccount)
+        AddtoaccountData(newaccount)
     } catch (error) {
         console.error('發生錯誤:',  error.accountmessage || error);
     }

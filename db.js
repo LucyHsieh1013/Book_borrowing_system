@@ -29,13 +29,43 @@ async function connectDB() {
     return poolPromise;
 }
 
+//查詢
 async function queryDB(query) {
     const pool = await connectDB();
     return pool.request().query(query);
 }
 
-module.exports = { connectDB, queryDB };
+//寫入
+async function executeQuery(query, params = {}) {
+    const pool = await connectDB();
+    const request = pool.request();
 
+    // Bind parameters to the query
+    for (const [key, value] of Object.entries(params)) {
+        request.input(key, value);
+    }
+
+    return request.query(query);
+}
+module.exports = { connectDB, queryDB, executeQuery};
+
+// async function queryDB(query, params = {}) {
+//     try {
+//         const pool = await connectDB();
+//         const request = pool.request();
+
+//         // 設定參數
+//         for (const [key, value] of Object.entries(params)) {
+//             request.input(key, value);
+//         }
+
+//         const result = await request.query(query);
+//         return result.recordset; // 返回資料集
+//     } catch (err) {
+//         console.error("Query execution failed:", err);
+//         throw err;
+//     }
+// }
 // sql.connect(config, err => {
 //     if (err) {
 //         throw err;
