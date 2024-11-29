@@ -4,14 +4,38 @@ const fs = require('fs')
 const bodyParser = require("body-parser")
 const { queryDB, executeQuery } = require('./db');
 const cors = require('cors');
+const session = require('express-session');
+const multer = require("multer");
 
 const app = express()
 const port = 3000
 
 app.use('/', express.static(path.join(__dirname, 'public')));
 app.use(cors())
-
+app.use(session({
+    secret: 'testSecretForDevOnly',
+    resave: false, 
+    saveUninitialized: false, 
+    cookie: { secure: false } 
+}));
+//----------------------------------------------
+const uploadFolder = path.join(__dirname, "./public/picture");
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, uploadFolder);
+    },
+    filename: (req, file, cb) => {
+        const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+        cb(null, uniqueSuffix + path.extname(file.originalname)); 
+    },
+});
+const upload = multer({ storage });
+//--------------------------------------------------
 app.get('/book', (req, res) => {
+    console.log('Session:', req.session);
+    if (!req.session || !req.session.user) {
+        return res.redirect('/login'); // 未登入，跳回登入頁面
+    }
     res.sendFile(path.join(__dirname, 'public', 'books.html'));
 });
 app.get('/borrow', (req, res) => {
@@ -20,9 +44,18 @@ app.get('/borrow', (req, res) => {
 app.get('/manager', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'manager.html'));
 });
+
+app.get('/api/user-info', (req, res) => {
+    if (!req.session.user) {
+        return res.status(401).json({ message: "未登入" });
+    }
+
+    res.json({ account: req.session.user.account });
+});
 //解析表單數據，將數據放到req.body中
 app.use(bodyParser.urlencoded({extended: true}))
 app.use(bodyParser.json());
+
 
 //抓取database資料--------------------------------------------------------
 app.get("/data/:type", async (req, res) => {
@@ -63,7 +96,7 @@ app.post('/search', async(req,res) =>{
     }
 })
 //新增修改數據--------------------------------------------------------
-app.post("/adddata/:type", async (req, res) => {
+app.post("/adddata/:type", upload.single("picture"), async (req, res) => {
     const datatype = req.params.type
     console.log(datatype)
     
@@ -87,6 +120,8 @@ app.post("/adddata/:type", async (req, res) => {
     }else if(datatype === 'book'){
         const { bookindex, bookname, auther, publishing, year, status} = req.body;
 
+        const picture = req.file ? `/picture/${req.file.filename}` : "無";
+
         query = `
             INSERT INTO booksdata (bookindex, bookname, auther, publishing, year, picture, status)
             VALUES (@bookindex, @bookname, @auther, @publishing, @year, @picture, @status)
@@ -98,7 +133,7 @@ app.post("/adddata/:type", async (req, res) => {
             auther: auther,
             publishing: publishing,
             year: year,
-            picture: "無",
+            picture: picture,
             status: status
         };
     }
@@ -129,28 +164,57 @@ app.post("/adddata/:type", async (req, res) => {
 // }
 
 //登入--------------------------------------------------------
-app.post('/login', (req,res) =>{
-    const {account, password} = req.body;
-    const filepath = path.join(__dirname, './database/account-data.json')
+app.post('/login', async (req,res) =>{
+    const {account, password} = req.body;    
+    console.log("帳號:", account)
 
-    console.log("帳號密碼:",account, password)
-    fs.readFile(filepath, 'utf8', (err,fileData) => {
-        if(err){
-            return res.status(500).json({message: "伺服器錯誤，無法讀取資料"})
-        }
+    try{
+        const query = `
+            SELECT account, role
+            FROM userdata
+            WHERE account = @account AND password = @password
+        `
+        const result = await executeQuery(query,{
+            account:account,
+            password:password,
+        })
 
-        const accounts = JSON.parse(fileData)
-
-        const user = accounts.find(
-            (user) => user.account === account && user.password === password
-        )
-
-        if(user){
-            return res.json({message: "登入成功!", user:{account: user.account} })
+        if(result.recordset.length > 0){
+            // return res.json({message:"登入成功!", user: {account: result.recordset[0].account} });
+            if (result.recordset[0].role === '管理者'){
+                return res.redirect('/manager')
+            }else{
+                req.session.user = { account: result.recordset[0].account };
+                return res.redirect('/book')
+            }
+            
         }else{
-            return res.status(400).json({message: "帳號或密碼錯誤"})
+            console.error("登入時發生錯誤:", err);
+            return res.status(500).json({ message: "伺服器錯誤，請稍後再試" });
         }
-    })
+    }catch (err) {
+        console.error("登入時發生錯誤:", err);
+        return res.status(500).json({ message: "伺服器錯誤，請稍後再試" });
+    }
+
+    
+    // fs.readFile(filepath, 'utf8', (err,fileData) => {
+    //     if(err){
+    //         return res.status(500).json({message: "伺服器錯誤，無法讀取資料"})
+    //     }
+
+    //     const accounts = JSON.parse(fileData)
+
+    //     const user = accounts.find(
+    //         (user) => user.account === account && user.password === password
+    //     )
+
+    //     if(user){
+    //         return res.json({message: "登入成功!", user:{account: user.account} })
+    //     }else{
+    //         return res.status(400).json({message: "帳號或密碼錯誤"})
+    //     }
+    // })
 })
 
 //讀取json檔數據並回傳--------------------------------------------------------

@@ -32,38 +32,51 @@ function rendertable(data, tableId){
 async function booksubmit(e) {
     e.preventDefault();
     
-    const bookindex = document.getElementById('bookindex').value;
-    const bookname = document.getElementById('bookname').value;
-    const auther = document.getElementById('auther').value;
-    const publishing = document.getElementById('publishing').value;
-    const year = document.getElementById('year').value;
-    const status = document.getElementById('status').value;
+    const form = document.getElementById('bookform');
+    const formData = new FormData(form);
+    console.log("form:",form)
+    // const bookindex = document.getElementById('bookindex').value;
+    // const bookname = document.getElementById('bookname').value;
+    // const auther = document.getElementById('auther').value;
+    // const publishing = document.getElementById('publishing').value;
+    // const year = document.getElementById('year').value;
+    // const status = document.getElementById('status').value;
 
+    // const newbook = {
+    //     bookindex,
+    //     bookname,
+    //     auther,
+    //     publishing,
+    //     year,
+    //     status
+    // };
     const newbook = {
-        bookindex,
-        bookname,
-        auther,
-        publishing,
-        year,
-        status
+        bookindex: formData.get('bookindex'),
+        bookname: formData.get('bookname'),
+        auther: formData.get('auther'),
+        publishing: formData.get('publishing'),
+        year: formData.get('year'),
+        status: formData.get('status')
     };
     console.log("新書資料:",newbook)
     
     //將新書資料送到後端
-    await sendbookdata(newbook)
+    await sendbookdata(formData, newbook)
 
     //清空表單
-    document.getElementById('bookform').reset();
+    // document.getElementById('bookform').reset();
+    form.reset();
 }
 
-async function sendbookdata(newbook) {
+async function sendbookdata(formData, newbook) {
     try{
         const response = await fetch('/adddata/book', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(newbook),
+            // headers: {
+            //     'Content-Type': 'application/json',
+            // },
+            // body: JSON.stringify(newbook),
+            body: formData
         })
 
         const result = await response.json();
