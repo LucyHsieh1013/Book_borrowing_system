@@ -35,21 +35,7 @@ async function booksubmit(e) {
     const form = document.getElementById('bookform');
     const formData = new FormData(form);
     console.log("form:",form)
-    // const bookindex = document.getElementById('bookindex').value;
-    // const bookname = document.getElementById('bookname').value;
-    // const auther = document.getElementById('auther').value;
-    // const publishing = document.getElementById('publishing').value;
-    // const year = document.getElementById('year').value;
-    // const status = document.getElementById('status').value;
 
-    // const newbook = {
-    //     bookindex,
-    //     bookname,
-    //     auther,
-    //     publishing,
-    //     year,
-    //     status
-    // };
     const newbook = {
         bookindex: formData.get('bookindex'),
         bookname: formData.get('bookname'),
@@ -72,10 +58,6 @@ async function sendbookdata(formData, newbook) {
     try{
         const response = await fetch('/adddata/book', {
             method: 'POST',
-            // headers: {
-            //     'Content-Type': 'application/json',
-            // },
-            // body: JSON.stringify(newbook),
             body: formData
         })
 
@@ -120,6 +102,7 @@ function renderaccounttable(data, tableId){
         tableBody.appendChild(tr);
     });
 }
+
 async function accountsubmit(e) {
     e.preventDefault();
 
@@ -175,4 +158,24 @@ function AddtoaccountData(newaccount){
     console.log("目前帳號資料:", accountData)
 
     renderaccounttable(accountData, 'showaccount')
+}
+
+//-------------------------------------------------
+function renderrecordtable(data, tableId){
+    console.log(data)
+    const tableBody = document.getElementById(tableId);
+    tableBody.innerHTML = '';
+
+    data.forEach((row, index) => {
+        const tr = document.createElement('tr');
+
+        tr.innerHTML = `
+            <td>${index + 1}</td>
+            <td>${row.recordindex}</td>
+            <td>${row.bookindex}</td>
+            <td>${row.userindex}</td>
+        `;
+
+        tableBody.appendChild(tr);
+    });
 }

@@ -1,6 +1,6 @@
 const express = require("express")
 const path = require("path")
-const fs = require('fs')
+// const fs = require('fs')
 const bodyParser = require("body-parser")
 const { queryDB, executeQuery } = require('./db');
 const cors = require('cors');
@@ -44,13 +44,16 @@ app.get('/borrow', (req, res) => {
 app.get('/manager', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'manager.html'));
 });
+app.get('/record', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'record.html'));
+});
 
 app.get('/api/user-info', (req, res) => {
     if (!req.session.user) {
         return res.status(401).json({ message: "未登入" });
     }
 
-    res.json({ account: req.session.user.account });
+    res.json({ account: req.session.user.account, userindex: req.session.user.userindex});
 });
 //解析表單數據，將數據放到req.body中
 app.use(bodyParser.urlencoded({extended: true}))
@@ -147,22 +150,45 @@ app.post("/adddata/:type", upload.single("picture"), async (req, res) => {
         res.status(500).json({ error: `無法新增${datatype}。` });
     }
 });
-// async function updateBookYear(bookId, newYear) {
-//     const query = `
-//         UPDATE Books
-//         SET Year = @Year
-//         WHERE BookID = @BookID
-//     `;
-//     const params = { Year: newYear, BookID: bookId };
+//借閱---------------------------------------------------------
+app.put("/update/:type", async(req,res) =>{
+    const datatype = req.params.type
+    console.log("app datatype:", datatype)
+    const {bookindex, userindex} = req.body
+    console.log("app bookindex",bookindex, userindex)
 
-//     try {
-//         const result = await executeQuery(query, params);
-//         console.log("Book updated successfully:", result.rowsAffected);
-//     } catch (err) {
-//         console.error("Error updating book:", err);
-//     }
-// }
+    const newStatus = datatype === "borrow" ? "已外借" : "尚在館內";
+    console.log("app newStatus",newStatus)
 
+    //booksdata狀態變更
+    const query = `
+        UPDATE booksdata
+        SET status = @newStatus
+        WHERE bookindex = @bookindex
+    `;
+    const params = {newStatus, bookindex}
+    
+
+    //寫入record
+    const insertRecordQuery = `
+            INSERT INTO record (userindex, bookindex, borrowingtime, record)
+            VALUES (@userindex, @bookindex, @borrowingtime, @record)
+        `;
+    const insertparams = {userindex, bookindex, borrowingtime:'無', record:'未還'}
+
+    console.log("params",params)
+
+    try {
+        await executeQuery(query, params);
+        await executeQuery(insertRecordQuery, insertparams);
+
+        res.status(200).json({ message: `${datatype}更新成功！` });
+    } catch (err) {
+        console.error(`更新${datatype}時發生錯誤:`, err);
+        res.status(500).json({ error: `無法更新${datatype}。` });
+    }
+
+})
 //登入--------------------------------------------------------
 app.post('/login', async (req,res) =>{
     const {account, password} = req.body;    
@@ -170,7 +196,7 @@ app.post('/login', async (req,res) =>{
 
     try{
         const query = `
-            SELECT account, role
+            SELECT account, role, userindex
             FROM userdata
             WHERE account = @account AND password = @password
         `
@@ -180,11 +206,11 @@ app.post('/login', async (req,res) =>{
         })
 
         if(result.recordset.length > 0){
-            // return res.json({message:"登入成功!", user: {account: result.recordset[0].account} });
-            if (result.recordset[0].role === '管理者'){
+            const user = result.recordset[0];
+            if (user.role === '管理者'){
                 return res.redirect('/manager')
             }else{
-                req.session.user = { account: result.recordset[0].account };
+                req.session.user = { account: user.account, userindex: user.userindex};
                 return res.redirect('/book')
             }
             
@@ -196,92 +222,8 @@ app.post('/login', async (req,res) =>{
         console.error("登入時發生錯誤:", err);
         return res.status(500).json({ message: "伺服器錯誤，請稍後再試" });
     }
-
-    
-    // fs.readFile(filepath, 'utf8', (err,fileData) => {
-    //     if(err){
-    //         return res.status(500).json({message: "伺服器錯誤，無法讀取資料"})
-    //     }
-
-    //     const accounts = JSON.parse(fileData)
-
-    //     const user = accounts.find(
-    //         (user) => user.account === account && user.password === password
-    //     )
-
-    //     if(user){
-    //         return res.json({message: "登入成功!", user:{account: user.account} })
-    //     }else{
-    //         return res.status(400).json({message: "帳號或密碼錯誤"})
-    //     }
-    // })
 })
-
-//讀取json檔數據並回傳--------------------------------------------------------
-// app.get('/get-data/:type', async(req, res) => {
-//     const datatype = req.params.type
-//     const filepath = path.join(__dirname, `./database/${datatype}-data.json`);
-
-//     fs.readFile(filepath, 'utf8', (err, fileData) => {
-//         if(err){
-//             return res.status(500).json({message: 'Error reading file'});
-//         }
-
-//         let jsonData = []
-//         if(fileData){
-//             jsonData = JSON.parse(fileData);
-//         }
-
-//         // console.log(jsonData);
-//         res.json(jsonData);
-//     })
-// })
-
-//manager新增數據到json
-// app.post('/add-data/:type', (req,res) => {
-//     const datatype = req.params.type
-//     const data = req.body
-//     const filepath = path.join(__dirname, `./database/${datatype}-data.json`)
-
-//     console.log(`${datatype}資料:`,data);
-
-//     fs.readFile(filepath,'utf8', (err,fileData) => {
-//         if(err && err.code !== 'ENOENT'){//忽略ENOENT文件不存在的錯誤，第一次輸入資料時創建檔案
-//             return res.status(500).json({message: 'Error reading file'})
-//         }
-        
-//         let jsonData = []
-//         if(fileData){
-//             jsonData = JSON.parse(fileData);
-//         }
-
-//         if(datatype === 'books'){
-//             const newBookData = {
-//                 ...data,
-//                 status: "尚在館內"
-//             };
-//             jsonData.push(newBookData)
-//             resMessage = { message: '書籍新增成功', data: newBookData }
-//         }else{
-//             jsonData.push(data)
-//             resMessage = { message: '帳號新增成功', data: data }
-//         }
-        
-//         //如果文件不存在，fs.writeFile 會創建一個新文件；如果文件已存在，會加入內容
-//         //讀取jsonData的內容，將資料寫入filepath路徑的檔案裡
-//         fs.writeFile(filepath, JSON.stringify(jsonData, null, 2), (err) => {
-//             if(err){
-//                 return res.status(500).json({message: 'Error writing to file'});
-//             }
-
-//             res.json(resMessage);
-//         })
-//     })
-// })
-//資料庫連接-------------------------------------------------------------------
-
-//----------------------------------------------------------------
-
+//---------------------------------------------------------
 app.listen(port,() => {
     console.log("server is running on port 3000")
 })

@@ -32,7 +32,37 @@ th, td {
     object-fit: cover; 
   } */
 
-a{
-    color: black; 
-    text-decoration: none
+.booklist{
+    text-decoration: none; /* 移除預設的底線 */
+    color: black;
+}
+.booklist:hover{
+    color: rgb(183, 159, 123);
+}
+
+
+.btnstyle {
+    position: relative; /* 需要設定相對位置來處理底線 */
+    text-decoration: none; /* 移除預設的底線 */
+    color: #F7F3ED;
+}
+.btnstyle::after {
+    content: ''; /* 使用偽元素創建底線 */
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 2px; /* 底線的高度 */
+    background-color: white; /* 底線顏色 */
+    transform: scaleX(0); /* 預設底線隱藏 */
+    transform-origin: bottom right; /* 底線顯示時從右邊開始 */
+    transition: transform 0.3s ease; /* 漸變效果 */
+}
+.btnstyle:hover::after {
+    transform: scaleX(1); /* 滑鼠懸停時，底線顯示 */
+    transform-origin: bottom left; /* 底線顯示時從左邊開始 */
+    
+}
+.btnstyle:hover{
+    color: white;
 }
