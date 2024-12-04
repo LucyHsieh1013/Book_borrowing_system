@@ -14,24 +14,27 @@
     <div id="header-container"></div>
 
     <div class="container">
-        <!-- <div id="bookdata"></div> -->
+        <div class="pt-2">
+            <table class="table" style="border-color:#dbc5a1;">
+                <thead>
+                    <tr>
+                        <th>序號</th>
+                        <th>書名</th>
+                        <th>借閱日期</th>
+                        <th>狀態</th>
+                        <th class="d-flex justify-content-center">還書</th>
+                    </tr>
+                </thead>
+                    <tbody id="showrecord">
+                </tbody>
+            </table>
+        </div>
     </div>
     <script src="./js/readdata.js"></script>
 </body>
 <script>
-    // const url = new URLSearchParams(window.location.search); 
-    // const bookindex = url.get('index');
-    // console.log(bookindex)
-    
-    // renderBookData(bookindex);
     displayWelcomeMessage()
     Header();
-
-    // fetch('/data/borrowing_record')
-    //     .then(response => response.json())
-    //     .then(data => {
-    //         console.log(data)
-    //         renderrecordtable(data,'showrecord');
-    //     })
+    storeAndFetchUserInfo();
 </script>
 

@@ -8,12 +8,11 @@
     height: 100vh;
 }
 /* ------------------------------ */
-table {
+/* table {
     width: 100%;
     border-collapse: collapse;
 }
 table, th, td {
-    /* border: 1px solid black; */
     border: none;
 }
 th, td {
@@ -21,8 +20,21 @@ th, td {
     height: 10vh;
     text-align: center;
     vertical-align: middle;
-    /* padding: 8px;
-    text-align: left; */
+} */
+.special-table {
+    width: 100%;
+    border-collapse: collapse;
+    border: none;
+    border-color:#dbc5a1;
+}
+
+.special-table th, 
+.special-table td {
+    width: 25%;
+    height: 10vh;
+    text-align: center;
+    vertical-align: middle;
+    border: none;
 }
 /* .no-border-table td,.no-border-table th {
     border: none;

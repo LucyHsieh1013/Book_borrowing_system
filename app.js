@@ -74,6 +74,47 @@ app.get("/data/:type", async (req, res) => {
         res.status(500).json({ error: "Failed to fetch data from the database" });
     }
 });
+//record抓取對應使用者資料
+app.get("/data/record/:userindex", async (req, res) => {
+    const userindex = req.params.userindex;
+    console.log("後端",userindex)
+    try {
+        const result = await executeQuery('SELECT * FROM record WHERE userindex = @userindex', {
+            userindex: userindex
+        });
+
+        const records = result.recordset;
+
+        // 为每一条记录添加对应的 bookname
+        const recordsWithBookNames = await Promise.all(records.map(async (record) => {
+            const bookindex = record.bookindex;
+            
+            // 根据 bookindex 查询 booksdata 表，获取 bookname
+            const bookResult = await executeQuery('SELECT bookname FROM booksdata WHERE bookindex = @bookindex', {
+                bookindex: bookindex
+            });
+            console.log(bookResult.recordset[0])
+            const bookname = bookResult.recordset[0]?.bookname || '未知书名'; // 如果没有找到书名，返回 '未知书名'
+            
+            // 返回包含 bookname 的记录
+            return {
+                ...record,
+                bookname: bookname
+            };
+        }));
+
+        console.log("Updated records with book names:", recordsWithBookNames);
+        
+        // 返回包含书名的记录数据
+        res.json(recordsWithBookNames);
+        // console.log("result",result.recordset);
+        // res.json(result.recordset);
+    } catch (err) {
+        console.error("Error executing query:", err);
+        res.status(500).json({ error: "Failed to fetch data from the database" });
+    }
+});
+
 //關鍵字搜尋database資料--------------------------------------------------------
 app.post('/search', async(req,res) =>{
     const searchQuery = req.body.search
@@ -154,8 +195,8 @@ app.post("/adddata/:type", upload.single("picture"), async (req, res) => {
 app.put("/update/:type", async(req,res) =>{
     const datatype = req.params.type
     console.log("app datatype:", datatype)
-    const {bookindex, userindex} = req.body
-    console.log("app bookindex",bookindex, userindex)
+    const {bookindex, userindex, borrowingtime} = req.body
+    console.log("app bookindex",bookindex, userindex, borrowingtime)
 
     const newStatus = datatype === "borrow" ? "已外借" : "尚在館內";
     console.log("app newStatus",newStatus)
@@ -174,7 +215,7 @@ app.put("/update/:type", async(req,res) =>{
             INSERT INTO record (userindex, bookindex, borrowingtime, record)
             VALUES (@userindex, @bookindex, @borrowingtime, @record)
         `;
-    const insertparams = {userindex, bookindex, borrowingtime:'無', record:'未還'}
+    const insertparams = {userindex, bookindex, borrowingtime, record:'未還'}
 
     console.log("params",params)
 

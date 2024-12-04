@@ -15,6 +15,45 @@ async function Identity() {
         window.location.href = '/login'; // 未登入時跳轉回登入頁
     }
 }
+async function fetchUserInfo() {
+    const userInfo = await Identity();
+    // 模拟从 API 获取用户信息
+    return new Promise((resolve) => {
+        setTimeout(() => resolve(userInfo), 100); // 模拟异步返回 userIndex
+    });
+}
+async function storeAndFetchUserInfo() {
+    try {
+        const userInfo = await fetchUserInfo(); // 等待获取用户信息
+        if (userInfo) {
+            const { account, userindex } = userInfo;
+            localStorage.setItem('userIndex', userindex); // 存储 userIndex 到 LocalStorage
+            console.log("User Index saved to LocalStorage:", userindex);
+
+            // 确保存储完成后再获取 storedUserIndex
+            const storedUserIndex = localStorage.getItem('userIndex');
+            console.log("User Index from LocalStorage:", storedUserIndex);
+            // 使用 storedUserIndex 进行后续操作
+            fetch(`/data/record/${storedUserIndex}`)
+                .then(response => response.json())
+                .then(data => {
+                    console.log("Fetched record data:", data);
+                    //表格渲染
+                    renderrecordtable(data,'showrecord');
+                })
+
+                .catch(error => {
+                    console.error('Error fetching data', error);
+                });
+        }
+    } catch (error) {
+        console.error("Error during user info fetch or storage:", error);
+    }
+}
+// 清除数据示例
+// localStorage.removeItem('userIndex');
+// localStorage.clear();
+
 //創建表格td元素
 function createCell(content) {
     const cell = document.createElement('td');
@@ -113,9 +152,11 @@ function renderBookData(bookindex){
             if (!isBorrowed) {
                 document.getElementById('borrow').addEventListener('click', (e) =>{
                     e.preventDefault();
-                    
-                    console.log("bookindex:", bookindex)
-                    Borrowingstatus("borrow", bookindex)
+
+                    const currentDate = new Date();
+                    const borrowingtime = currentDate.toLocaleDateString();
+                    console.log("bookindex:", bookindex, borrowingtime)
+                    Borrowingstatus("borrow", bookindex, borrowingtime)
                 })
             }
         })
@@ -125,7 +166,7 @@ function renderBookData(bookindex){
 }
 //---------------------------------------------------------------------
 //更新書籍狀態
-async function Borrowingstatus(buttonId, bookindex){
+async function Borrowingstatus(buttonId, bookindex, borrowingtime){
     const userInfo = await Identity();
     const userindex = userInfo.userindex
     console.log("借書人userindex",userindex)
@@ -137,7 +178,7 @@ async function Borrowingstatus(buttonId, bookindex){
                 "content-Type":"application/json",
             },
             // body: JSON.stringify({ bookindex}),
-            body: JSON.stringify({ bookindex, userindex }),
+            body: JSON.stringify({ bookindex, userindex, borrowingtime}),
         })
         const result = await response.json();
         if (response.ok) {
@@ -173,4 +214,31 @@ async function displayWelcomeMessage() {
     if (userInfo) {
         document.getElementById('welcome-message').innerText = `登出 ${userInfo.account}`;
     }
+}
+//record表格渲染-------------------------------------------------------------------------------------
+//創建表格td元素
+function createCell(content) {
+    const cell = document.createElement('td');
+    cell.textContent = content;
+    return cell;
+}
+//將數據顯示在表格中
+async function renderrecordtable(data, tableId){
+    console.log(data)
+    const tableBody = document.getElementById(tableId);
+    tableBody.innerHTML = '';
+
+    data.forEach((row, index) => {
+        const tr = document.createElement('tr');
+        // console.log("帳號",row.password)
+        tr.innerHTML = `
+            <td style="vertical-align: middle;">${index + 1}</td>
+            <td style="vertical-align: middle;">${row.bookname}</td>
+            <td style="vertical-align: middle;">${row.borrowingtime}</td>
+            <td style="vertical-align: middle;">${row.record}</td>
+            <td class="d-flex justify-content-center"><button class="btn btn-primary">還書</button></td>
+        `;
+
+        tableBody.appendChild(tr);
+    });
 }
