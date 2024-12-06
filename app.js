@@ -6,6 +6,7 @@ const { queryDB, executeQuery } = require('./db');
 const cors = require('cors');
 const session = require('express-session');
 const multer = require("multer");
+const sql = require("mssql");
 
 const app = express()
 const port = 3000
@@ -79,10 +80,20 @@ app.get("/data/record/:userindex", async (req, res) => {
     const userindex = req.params.userindex;
     console.log("後端",userindex)
     try {
-        const result = await executeQuery('SELECT * FROM record WHERE userindex = @userindex', {
-            userindex: userindex
-        });
 
+        const query = `
+            SELECT * FROM record 
+            WHERE userindex = @userindex
+            ORDER BY 
+                CASE 
+                    WHEN record = '已預約' THEN 1 
+                    ELSE 2 
+                END;
+        `;
+        const params = {
+            userindex: userindex
+        };
+        const result = await executeQuery(query,params)
         const records = result.recordset;
 
         // 为每一条记录添加对应的 bookname
@@ -105,10 +116,7 @@ app.get("/data/record/:userindex", async (req, res) => {
 
         console.log("Updated records with book names:", recordsWithBookNames);
         
-        // 返回包含书名的记录数据
         res.json(recordsWithBookNames);
-        // console.log("result",result.recordset);
-        // res.json(result.recordset);
     } catch (err) {
         console.error("Error executing query:", err);
         res.status(500).json({ error: "Failed to fetch data from the database" });
@@ -198,7 +206,7 @@ app.put("/update/:type", async(req,res) =>{
     const {bookindex, userindex, borrowingtime} = req.body
     console.log("app bookindex",bookindex, userindex, borrowingtime)
 
-    const newStatus = datatype === "borrow" ? "已外借" : "尚在館內";
+    const newStatus = datatype === "borrow" ? "已被預約" : "尚在館內";
     console.log("app newStatus",newStatus)
 
     //booksdata狀態變更
@@ -212,11 +220,12 @@ app.put("/update/:type", async(req,res) =>{
 
     //寫入record
     const insertRecordQuery = `
-            INSERT INTO record (userindex, bookindex, borrowingtime, record)
-            VALUES (@userindex, @bookindex, @borrowingtime, @record)
-        `;
-    const insertparams = {userindex, bookindex, borrowingtime, record:'未還'}
-
+        INSERT INTO record (userindex, bookindex, borrowingtime, record)
+        VALUES (@userindex, @bookindex, @borrowingtime, @record)
+    `;
+    const insertparams = {userindex, bookindex, borrowingtime, record:'已預約'}
+    
+    
     console.log("params",params)
 
     try {
@@ -230,6 +239,46 @@ app.put("/update/:type", async(req,res) =>{
     }
 
 })
+//還書---------------------------------------------------
+app.post('/update-record', async (req, res) => {
+    const { userindex, bookindex } = req.body;
+
+    console.log("還書資料",userindex,bookindex)
+    try {
+        const query = `
+            UPDATE record
+            SET record = '已取消預約'
+            WHERE userindex = @userindex AND bookindex = @bookindex
+        `;
+        
+        const result = await executeQuery(query, 
+            {
+                userindex: userindex,
+                bookindex: bookindex,
+            }
+        );
+
+        //booksdata狀態變更
+        const booksdataquery = `
+            UPDATE booksdata
+            SET status = '尚在館內'
+            WHERE bookindex = @bookindex
+        `;
+        const booksdataparams = {bookindex}
+        await executeQuery(booksdataquery, booksdataparams);
+
+
+        if (result.rowsAffected[0] > 0) {
+            res.status(200).json({ success: true, message: 'Record updated successfully.' });
+        } else {
+            res.status(404).json({ success: false, message: 'Record not found.' });
+        }
+    } catch (error) {
+        console.error('Error updating record:', error);
+        res.status(500).json({ success: false, message: 'Server error.' });
+    }
+});
+
 //登入--------------------------------------------------------
 app.post('/login', async (req,res) =>{
     const {account, password} = req.body;    
@@ -264,6 +313,18 @@ app.post('/login', async (req,res) =>{
         return res.status(500).json({ message: "伺服器錯誤，請稍後再試" });
     }
 })
+//登出----------------------------------------------------
+app.get('/logout', (req, res) => {
+    req.session.destroy((err) => {
+        if (err) {
+            console.error("Session 銷毀失敗:", err);
+            return res.status(500).send("登出失敗");
+        }
+        res.clearCookie('connect.sid'); // 清除 session cookie
+        res.redirect('/'); // 導向登入頁面
+    });
+});
+
 //---------------------------------------------------------
 app.listen(port,() => {
     console.log("server is running on port 3000")

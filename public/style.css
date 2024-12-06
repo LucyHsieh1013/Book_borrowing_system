@@ -27,7 +27,12 @@ th, td {
     border: none;
     border-color:#dbc5a1;
 }
-
+/* .col-auto {
+    flex-grow: 0; 
+    flex-shrink: 1; 
+    margin-left: 20rem;
+    margin-right: 20rem;
+} */
 .special-table th, 
 .special-table td {
     width: 25%;

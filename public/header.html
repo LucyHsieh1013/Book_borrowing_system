@@ -6,15 +6,31 @@
             </div>
         </div>
         <strong class="col d-flex justify-content-end align-items-center">
-                <div class="col-6 d-flex justify-content-end">
+                <div class="col-3 mx-1 d-flex justify-content-end">
                     <a href="/book" class="btnstyle">書籍借閱</a>
                 </div>
-                <div class="col-3 d-flex justify-content-end">
+                <div class="col-3 mx-1 d-flex justify-content-end">
                     <a href="/record" class="btnstyle">借書紀錄</a>
                 </div>
                 <div class="col-3 mb-0 d-flex justify-content-end">
-                    <a href="#" class="btnstyle" id="welcome-message"></a>
+                    <a href="#" class="btnstyle" data-bs-toggle="modal" data-bs-target="#logoutpage">登出</a>
                 </div>
         </strong>
     </div>
+    <div class="modal fade" id="logoutpage" tabindex="-1" aria-labelledby="logoutpageLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body h3 text-center">
+                    確定要登出嗎?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" id="logout">確認登出</button>
+                </div>
+            </div>
+            </div>
+        </div>
 </div>

@@ -1,5 +1,5 @@
 
-//身分傳遞
+//從後端取得登入者資料
 async function Identity() {
     try {
         const response = await fetch('/api/user-info');
@@ -19,40 +19,26 @@ async function fetchUserInfo() {
     const userInfo = await Identity();
     // 模拟从 API 获取用户信息
     return new Promise((resolve) => {
-        setTimeout(() => resolve(userInfo), 100); // 模拟异步返回 userIndex
+        setTimeout(() => resolve(userInfo), 100);
     });
 }
-async function storeAndFetchUserInfo() {
+//用於前端登入後呼叫函式將使用者資料存入localstorage
+async function storeUserInfo() {
     try {
-        const userInfo = await fetchUserInfo(); // 等待获取用户信息
+        const userInfo = await fetchUserInfo();
         if (userInfo) {
             const { account, userindex } = userInfo;
-            localStorage.setItem('userIndex', userindex); // 存储 userIndex 到 LocalStorage
+
+            // 存入localStorage
+            localStorage.setItem('userInfo', JSON.stringify({ account, userindex }));
+
+            console.log("User account saved to LocalStorage:", account);
             console.log("User Index saved to LocalStorage:", userindex);
-
-            // 确保存储完成后再获取 storedUserIndex
-            const storedUserIndex = localStorage.getItem('userIndex');
-            console.log("User Index from LocalStorage:", storedUserIndex);
-            // 使用 storedUserIndex 进行后续操作
-            fetch(`/data/record/${storedUserIndex}`)
-                .then(response => response.json())
-                .then(data => {
-                    console.log("Fetched record data:", data);
-                    //表格渲染
-                    renderrecordtable(data,'showrecord');
-                })
-
-                .catch(error => {
-                    console.error('Error fetching data', error);
-                });
         }
     } catch (error) {
-        console.error("Error during user info fetch or storage:", error);
+        console.error("Error storing user info:", error);
     }
 }
-// 清除数据示例
-// localStorage.removeItem('userIndex');
-// localStorage.clear();
 
 //創建表格td元素
 function createCell(content) {
@@ -122,7 +108,7 @@ function renderBookData(bookindex){
             const item = data.find(item => item.bookindex === bookindex);
             console.log("item",item)
             console.log("data",data)
-            const isBorrowed = item.status === "已外借";
+            const isBorrowed = item.status === "已被預約";
             if (item){
                 console.log("找到資料")
 
@@ -140,7 +126,7 @@ function renderBookData(bookindex){
                             <form id="borrow">
                                 <button class="btn mt-2 ${isBorrowed ? "btn-secondary" : "btn-outline-success"}"
                                     ${isBorrowed ? "disabled" : ""}>
-                                    ${isBorrowed ? "不在館內" : "借閱"}
+                                    ${isBorrowed ? "已被預約" : "預約"}
                                 </button>
                             </form>
                         </div>
@@ -193,7 +179,7 @@ async function Borrowingstatus(buttonId, bookindex, borrowingtime){
 }
 //---------------------------------------------------------------------
 //header
-function Header(){
+function Header() {
     document.addEventListener("DOMContentLoaded", () => {
         fetch("/header.html")
             .then((response) => {
@@ -202,20 +188,59 @@ function Header(){
             })
             .then((html) => {
                 document.getElementById("header-container").innerHTML = html;
+
+                // 在 header 加載後綁定事件代理
+                document.querySelector("#header-container").addEventListener('click', async (event) => {
+                    if (event.target && event.target.id === 'logout') {
+                        event.preventDefault(); // 防止默認的超鏈接行為
+
+                        try {
+                            const response = await fetch('/logout'); // 向後端發送登出請求
+                            if (response.ok) {
+                                // 清除 localStorage 並跳轉到登入頁面
+                                console.log("LocalStorage 已清除，Session 已銷毀");
+                                window.location.href = '/'; // 重定向到登入頁面
+                            } else {
+                                alert("登出失敗，請稍後再試。");
+                            }
+                        } catch (error) {
+                            console.error("登出過程中出現錯誤:", error);
+                            alert("登出時發生錯誤，請稍後再試。");
+                        }
+                    }
+                });
             })
             .catch((error) => console.error(error));
     });
 }
 
-//個人訊息登出鍵
-async function displayWelcomeMessage() {
-    const userInfo = await Identity();
-    console.log("displayWelcomeMessage",userInfo)
-    if (userInfo) {
-        document.getElementById('welcome-message').innerText = `登出 ${userInfo.account}`;
+//record表格渲染-------------------------------------------------------------------------------------
+//record頁面渲染
+async function fetchAndRenderRecord() {
+    try {
+        const storedUserInfo = localStorage.getItem('userInfo');
+
+        if (storedUserInfo) {
+            const { userindex } = JSON.parse(storedUserInfo);
+
+            console.log("User Index from LocalStorage:", userindex);
+
+            // 使用 userIndex 發送請求並渲染表格
+            const response = await fetch(`/data/record/${userindex}`);
+            const data = await response.json();
+
+            console.log("Fetched record data:", data);
+
+            // 渲染表格
+            renderrecordtable(data, 'showrecord',userindex);
+        } else {
+            console.warn("No user info found in LocalStorage.");
+        }
+    } catch (error) {
+        console.error("Error fetching or rendering record data:", error);
     }
 }
-//record表格渲染-------------------------------------------------------------------------------------
+
 //創建表格td元素
 function createCell(content) {
     const cell = document.createElement('td');
@@ -223,22 +248,63 @@ function createCell(content) {
     return cell;
 }
 //將數據顯示在表格中
-async function renderrecordtable(data, tableId){
-    console.log(data)
+async function renderrecordtable(data, tableId, userindex){
+    console.log("資料",data)
     const tableBody = document.getElementById(tableId);
     tableBody.innerHTML = '';
 
     data.forEach((row, index) => {
         const tr = document.createElement('tr');
         // console.log("帳號",row.password)
+        const isreserve = row.record === "已取消預約";
+
         tr.innerHTML = `
             <td style="vertical-align: middle;">${index + 1}</td>
             <td style="vertical-align: middle;">${row.bookname}</td>
             <td style="vertical-align: middle;">${row.borrowingtime}</td>
             <td style="vertical-align: middle;">${row.record}</td>
-            <td class="d-flex justify-content-center"><button class="btn btn-primary">還書</button></td>
+            <td class="d-flex justify-content-center">
+                <form id="reserve">
+                    <button class="btn mt-2 ${isreserve ? "btn-secondary" : "btn-outline-success"}"
+                        ${isreserve ? "disabled" : ""}>
+                        ${isreserve ? "已取消預約" : "取消預約"}
+                    </button>
+                </form>
+            </td>
         `;
+
+        const returnButton = tr.querySelector('#reserve');
+        returnButton.addEventListener('click', () => {
+            updaterecord(userindex, row.bookindex, returnButton, tr);
+        });
 
         tableBody.appendChild(tr);
     });
 }
+
+async function updaterecord(userindex, bookindex, returnButton, tr) {
+    console.log(userindex, bookindex);
+    const response = await fetch('/update-record', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            userindex: userindex,
+            bookindex: bookindex,
+        }),
+    });
+
+    const result = await response.json();
+
+    if (result.success) {
+        // 更新 UI 顯示取消預約狀態
+        returnButton.innerText = '已取消預約';
+        const actionCell = tr.querySelector('#return');
+        if (returnButton.innerText === '已取消預約') {
+            actionCell.remove();
+        }
+        alert('已取消預約！');
+    } else {
+        alert('取消預約失敗：' + result.message);
+    }
+}
+
