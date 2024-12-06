@@ -1,4 +1,3 @@
-//顯示書本資料
 //創建表格td元素
 function createCell(content) {
     const cell = document.createElement('td');
@@ -28,7 +27,7 @@ function rendertable(data, tableId){
     });
 }
 
-//表單
+//書籍新增表單
 async function booksubmit(e) {
     e.preventDefault();
     
@@ -46,14 +45,9 @@ async function booksubmit(e) {
     };
     console.log("新書資料:",newbook)
     
-    //將新書資料送到後端
     await sendbookdata(formData, newbook)
-
-    //清空表單
-    // document.getElementById('bookform').reset();
     form.reset();
 }
-
 async function sendbookdata(formData, newbook) {
     try{
         const response = await fetch('/adddata/book', {
@@ -83,7 +77,7 @@ function AddtotableData(newbook){
 
     rendertable(tableData, 'showbooks')
 }
-//帳號-------------------------------------------------------------
+//帳號畫面渲染-------------------------------------------------------------
 function renderaccounttable(data, tableId){
     console.log(data)
     const tableBody = document.getElementById(tableId);
@@ -120,7 +114,6 @@ async function accountsubmit(e) {
 
     console.log("新帳號資料:", newaccount)
     
-    //將新書資料送到後端
     await sendaccountdata(newaccount)
 
     //清空表單
@@ -141,9 +134,9 @@ async function sendaccountdata(newaccount) {
         console.log('後端回應:', result);
 
         if (response.ok) {
-            alert(result.message); // 顯示成功訊息
+            alert(result.message);
         } else {
-            alert(result.error); // 顯示錯誤訊息
+            alert(result.error);
         }
         console.log('newaccount',newaccount)
         AddtoaccountData(newaccount)
@@ -158,24 +151,4 @@ function AddtoaccountData(newaccount){
     console.log("目前帳號資料:", accountData)
 
     renderaccounttable(accountData, 'showaccount')
-}
-
-//-------------------------------------------------
-function renderrecordtable(data, tableId){
-    console.log(data)
-    const tableBody = document.getElementById(tableId);
-    tableBody.innerHTML = '';
-
-    data.forEach((row, index) => {
-        const tr = document.createElement('tr');
-
-        tr.innerHTML = `
-            <td>${index + 1}</td>
-            <td>${row.recordindex}</td>
-            <td>${row.bookindex}</td>
-            <td>${row.userindex}</td>
-        `;
-
-        tableBody.appendChild(tr);
-    });
 }

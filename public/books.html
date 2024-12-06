@@ -34,14 +34,10 @@
 </body>
 <script>
     storeUserInfo()
-    // displayWelcomeMessage()
     Header()
 
-    //存放後端傳來的數據
     let tableData = [];
-    
-    //獲取後端JSON數據
-    fetch('/data/booksdata')
+        fetch('/data/booksdata')
         .then(response => response.json())
         .then(data => {
             //保存數據，用於搜尋
@@ -51,7 +47,6 @@
             //將初始數據顯示在表格中
             rendertable(data,'book-table');
 
-            //關鍵字搜尋並渲染表格
             searchForm('searchForm', 'searchInput', 'book-table', tableData, ['bookname']);
 
         })
