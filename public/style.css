@@ -4,35 +4,34 @@
     color: #FFFFFF;
 }
 .BacgroundColor{
-    background-color: #F7F3ED;;
+    background-color: #F7F3ED;
     height: 100vh;
 }
-/* ------------------------------ */
-/* table {
-    width: 100%;
-    border-collapse: collapse;
-}
-table, th, td {
-    border: none;
-}
-th, td {
-    width: 25%;
-    height: 10vh;
+
+.loginbtn {
+    background-color: #352d2a;
+    color: white; 
+    border: none; 
+    padding: 8px 20px;
     text-align: center;
-    vertical-align: middle;
-} */
+    text-decoration: none; 
+    display: inline-block; 
+    font-size: 16px; 
+    cursor: pointer; 
+    transition: background-color 0.3s ease;
+}
+.loginbtn:hover {
+    background-color: #76563E;
+}
+
+/* ------------------------------ */
 .special-table {
     width: 100%;
     border-collapse: collapse;
     border: none;
     border-color:#dbc5a1;
 }
-/* .col-auto {
-    flex-grow: 0; 
-    flex-shrink: 1; 
-    margin-left: 20rem;
-    margin-right: 20rem;
-} */
+
 .special-table th, 
 .special-table td {
     width: 25%;
@@ -41,14 +40,6 @@ th, td {
     vertical-align: middle;
     border: none;
 }
-/* .no-border-table td,.no-border-table th {
-    border: none;
-} */
-/* td img {
-    width: 40%; 
-    object-fit: cover; 
-  } */
-
 .booklist{
     text-decoration: none; /* 移除預設的底線 */
     color: black;
@@ -56,8 +47,6 @@ th, td {
 .booklist:hover{
     color: rgb(183, 159, 123);
 }
-
-
 .btnstyle {
     position: relative; /* 需要設定相對位置來處理底線 */
     text-decoration: none; /* 移除預設的底線 */

@@ -1,1 +1,0 @@
-// const {executeQuery} = require('./db');

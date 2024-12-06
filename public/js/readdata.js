@@ -188,17 +188,28 @@ function Header() {
             })
             .then((html) => {
                 document.getElementById("header-container").innerHTML = html;
+                
+                //使用者名稱渲染
+                const checkAccount = setInterval(() => {
+                    let storedUserInfo = localStorage.getItem('userInfo');
 
-                // 在 header 加載後綁定事件代理
+                    let { account } = JSON.parse(storedUserInfo);
+                    console.log("Printaccount", account);
+                    if (account) {
+                        document.getElementById('userAccount').textContent = account;
+                        clearInterval(checkAccount); 
+                    }
+                }, 50);
+                // 登出事件
                 document.querySelector("#header-container").addEventListener('click', async (event) => {
                     if (event.target && event.target.id === 'logout') {
-                        event.preventDefault(); // 防止默認的超鏈接行為
+                        event.preventDefault(); 
 
                         try {
-                            const response = await fetch('/logout'); // 向後端發送登出請求
+                            const response = await fetch('/logout'); 
                             if (response.ok) {
-                                // 清除 localStorage 並跳轉到登入頁面
-                                console.log("LocalStorage 已清除，Session 已銷毀");
+                                localStorage.clear();
+                                console.log("LocalStorage 已清除");
                                 window.location.href = '/'; // 重定向到登入頁面
                             } else {
                                 alert("登出失敗，請稍後再試。");
