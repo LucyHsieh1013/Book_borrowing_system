@@ -17,7 +17,6 @@ async function Identity() {
 }
 async function fetchUserInfo() {
     const userInfo = await Identity();
-    // 模拟从 API 获取用户信息
     return new Promise((resolve) => {
         setTimeout(() => resolve(userInfo), 100);
     });
@@ -163,12 +162,11 @@ async function Borrowingstatus(buttonId, bookindex, borrowingtime){
             headers:{
                 "content-Type":"application/json",
             },
-            // body: JSON.stringify({ bookindex}),
             body: JSON.stringify({ bookindex, userindex, borrowingtime}),
         })
         const result = await response.json();
         if (response.ok) {
-            alert(result.message); // 顯示成功訊息
+            alert(result.message); 
             renderBookData(bookindex);
         } else {
             alert(`更新失敗: ${result.error}`);
@@ -226,20 +224,16 @@ function Header() {
 }
 
 //record表格渲染-------------------------------------------------------------------------------------
-//record頁面渲染
 async function fetchAndRenderRecord() {
     try {
         const storedUserInfo = localStorage.getItem('userInfo');
 
         if (storedUserInfo) {
             const { userindex } = JSON.parse(storedUserInfo);
-
             console.log("User Index from LocalStorage:", userindex);
 
-            // 使用 userIndex 發送請求並渲染表格
             const response = await fetch(`/data/record/${userindex}`);
             const data = await response.json();
-
             console.log("Fetched record data:", data);
 
             // 渲染表格
@@ -266,7 +260,6 @@ async function renderrecordtable(data, tableId, userindex){
 
     data.forEach((row, index) => {
         const tr = document.createElement('tr');
-        // console.log("帳號",row.password)
         const isreserve = row.record === "已取消預約";
 
         tr.innerHTML = `
@@ -292,7 +285,7 @@ async function renderrecordtable(data, tableId, userindex){
         tableBody.appendChild(tr);
     });
 }
-
+//更新record
 async function updaterecord(userindex, bookindex, returnButton, tr) {
     console.log(userindex, bookindex);
     const response = await fetch('/update-record', {
@@ -307,7 +300,6 @@ async function updaterecord(userindex, bookindex, returnButton, tr) {
     const result = await response.json();
 
     if (result.success) {
-        // 更新 UI 顯示取消預約狀態
         returnButton.innerText = '已取消預約';
         const actionCell = tr.querySelector('#return');
         if (returnButton.innerText === '已取消預約') {
