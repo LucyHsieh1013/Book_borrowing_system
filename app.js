@@ -96,18 +96,16 @@ app.get("/data/record/:userindex", async (req, res) => {
         const result = await executeQuery(query,params)
         const records = result.recordset;
 
-        // 为每一条记录添加对应的 bookname
         const recordsWithBookNames = await Promise.all(records.map(async (record) => {
             const bookindex = record.bookindex;
             
-            // 根据 bookindex 查询 booksdata 表，获取 bookname
-            const bookResult = await executeQuery('SELECT bookname FROM booksdata WHERE bookindex = @bookindex', {
+            // 使用預存程序傳bookindex找bookname
+            const bookResult = await executeQuery('EXEC GetBookByIndex @bookindex', {
                 bookindex: bookindex
             });
             console.log(bookResult.recordset[0])
             const bookname = bookResult.recordset[0]?.bookname || '未知书名'; // 如果没有找到书名，返回 '未知书名'
             
-            // 返回包含 bookname 的记录
             return {
                 ...record,
                 bookname: bookname
@@ -278,7 +276,6 @@ app.post('/update-record', async (req, res) => {
         res.status(500).json({ success: false, message: 'Server error.' });
     }
 });
-
 //登入--------------------------------------------------------
 app.post('/login', async (req,res) =>{
     const {account, password} = req.body;    

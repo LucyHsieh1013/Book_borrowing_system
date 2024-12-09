@@ -14,19 +14,18 @@ function rendertable(data, tableId){
         const tr = document.createElement('tr');
         console.log("帳號",row.password)
         tr.innerHTML = `
-            <td>${index + 1}</td>
-            <td>${row.bookindex}</td>
-            <td>${row.bookname}</td>
-            <td>${row.auther}</td>
-            <td>${row.publishing}</td>
-            <td>${row.year}</td>
-            <td>${row.status}</td>
+            <td style="vertical-align: middle;">${index + 1}</td>
+            <td style="vertical-align: middle;">${row.bookindex}</td>
+            <td style="vertical-align: middle;">${row.bookname}</td>
+            <td style="vertical-align: middle;">${row.auther}</td>
+            <td style="vertical-align: middle;">${row.publishing}</td>
+            <td style="vertical-align: middle;">${row.year}</td>
+            <td style="vertical-align: middle;">${row.status}</td>
         `;
-
+        
         tableBody.appendChild(tr);
     });
 }
-
 //書籍新增表單
 async function booksubmit(e) {
     e.preventDefault();
