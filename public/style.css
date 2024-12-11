@@ -48,12 +48,12 @@
     color: rgb(183, 159, 123);
 }
 .btnstyle {
-    position: relative; /* 需要設定相對位置來處理底線 */
+    position: relative; /* 設定相對位置來處理底線 */
     text-decoration: none; /* 移除預設的底線 */
     color: #F7F3ED;
 }
 .btnstyle::after {
-    content: ''; /* 使用偽元素創建底線 */
+    content: ''; /* 創建底線 */
     position: absolute;
     left: 0;
     bottom: 0;

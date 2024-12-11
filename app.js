@@ -1,6 +1,5 @@
 const express = require("express")
 const path = require("path")
-// const fs = require('fs')
 const bodyParser = require("body-parser")
 const { queryDB, executeQuery } = require('./db');
 const cors = require('cors');
@@ -104,7 +103,7 @@ app.get("/data/record/:userindex", async (req, res) => {
                 bookindex: bookindex
             });
             console.log(bookResult.recordset[0])
-            const bookname = bookResult.recordset[0]?.bookname || '未知书名'; // 如果没有找到书名，返回 '未知书名'
+            const bookname = bookResult.recordset[0]?.bookname || '未知書名';
             
             return {
                 ...record,
@@ -136,7 +135,6 @@ app.post('/search', async(req,res) =>{
             WHERE bookname LIKE '%${searchQuery}%'
         `;
 
-        // 使用參數化查詢避免 SQL 注入
         const results = await queryDB(sql);
         console.log('查詢結果',results)
         res.json(results);
